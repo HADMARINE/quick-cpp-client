@@ -1,6 +1,6 @@
 cmake_minimum_required (VERSION 3.9)
 
-project(qucik-cpp-client)
+project(quick-cpp-client)
 
 # CPP REST SDK
 find_package(cpprestsdk CONFIG REQUIRED)
@@ -18,7 +18,7 @@ file(GLOB_RECURSE HPP_FILES ${CMAKE_CURRENT_SOURCE_DIR}/include/*.*)
 add_executable(${PROJECT_NAME} ${CPP_FILES} ${HPP_FILES})
 
 # LINK LIBRARIES
-target_link_libraries(${PROJECT_NAME} PRIVATE cpprestsdk::cpprest cpprestsdk::cpprestsdk_zlib_internal cpprestsdk::cpprestsdk_brotli_internal)
+target_link_libraries(${PROJECT_NAME} PRIVATE cpprestsdk::cpprest cpprestsdk::cpprestsdk_zlib_internal cpprestsdk::cpprestsdk_boost_internal cpprestsdk::cpprestsdk_openssl_internal)
 
 # SET PROPERTY
 set_property(TARGET ${PROJECT_NAME} PROPERTY RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/binaries)
