@@ -17,7 +17,9 @@ namespace quick_client {
 
         struct request_options {
             optional<web::http::methods> method,
-            optional<unordered_map<string,string>> headers,
+            optional<unordered_map<string, string>> headers,
+            optional<unordered_map<string, string>> query,
+            optional<string> body,
             optional<string> url,
         };
 
