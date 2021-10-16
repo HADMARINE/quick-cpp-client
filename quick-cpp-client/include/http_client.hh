@@ -6,21 +6,30 @@
 
 namespace quick_client {
     namespace http {
-        using json = nlohmann::json;
         using namespace std;
-        json http_get(string url, unordered_map<string, string>);
-        json http_post();
-        json http_patch();
-        json http_put();
-        json http_delete();
-        json primitive_requester();
+        using json = nlohmann::json;
+        
+        class http_instance {
+            string baseurl;
+            unordered_map<string, json> preset_headers;
 
-        struct request_options {
+            http_instance(string url, unordered_map<string, json> preset_headers);
+            ~http_instance();
+
+            json get(string url, request_config config);
+            json post(string url, request_config config);
+            json patch(string url, request_config config);
+            json put(string url, request_config config);
+            json delete(string url, request_config config);
+            json primitive_requester(request_config config);
+        }
+
+        struct request_config {
             optional<web::http::methods> method,
-            optional<unordered_map<string, string>> headers,
-            optional<unordered_map<string, string>> query,
-            optional<string> body,
-            optional<string> url,
+            optional<unordered_map<string, json>> headers,
+            optional<unordered_map<string, json>> query,
+            optional<json> body,
+            string url,
         };
 
     };
