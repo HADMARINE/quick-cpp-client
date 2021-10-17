@@ -1,2 +1,3 @@
 nlohmann-json
 cpprestsdk
+websocketpp

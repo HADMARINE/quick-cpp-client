@@ -1,5 +1,7 @@
 #include <cpprest/http_client.h>
 #include <cpprest/filestream.h>
+#include <http_client.hh>
+#include <tcp_client.hh>
 
 using namespace utility;                    // Common utilities like string conversions
 using namespace web;                        // Common features like URIs.
