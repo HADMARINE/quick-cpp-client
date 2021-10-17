@@ -10,7 +10,7 @@ namespace quick_client {
 
             void connect(string url);
             void send(event string, json data); 
-            void onRecieve(); // function
+            void onRecieve(void (json)); // function
         }
     }
 }
