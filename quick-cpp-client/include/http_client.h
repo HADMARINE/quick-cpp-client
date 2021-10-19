@@ -41,7 +41,7 @@ namespace quick_client {
             http_instance(utility::string_t url, vector<pair<utility::string_t, utility::string_t>> preset_headers);
             ~http_instance();
 
-            // 보낸 요청들의 상태를 확인 업데이트를 진행함
+            // 보낸 요청들이 완료될 때 까지 대기한다. (프로그램이 멈출 수 있음)
             void check_requesters();
 
             // config 넣어주면 주어진 값으로 request를 진행한다.
@@ -57,7 +57,7 @@ namespace quick_client {
             utility::string_t baseurl;
             vector<pair<utility::string_t, utility::string_t>> preset_headers;
 
-            // baseurl 기반 http 클라이언트 객체
+            // baseurl로 생성된 http 클라이언트 객체
             http_client client;
 
             // 토큰 발급 관리 전용
