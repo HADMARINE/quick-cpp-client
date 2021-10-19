@@ -1,30 +1,72 @@
-#include <nlohmann/json.hpp>
+#pragma once
 #include <string>
-#include <optional>
+#include <unordered_map>
+#include <map>
+#include <queue>
 #include <cpprest/http_client.h>
-
+#include <cpprest/http_headers.h>
 
 namespace quick_client {
-    namespace http {
+    namespace web_http {
         using namespace std;
-        using json = nlohmann::json;
-        
-        class http_instance {
-            string baseurl;
-            unordered_map<string, json> preset_headers;
+        using namespace web;
+        using namespace web::http;
+        using namespace web::http::client;
+        using namespace concurrency;
 
-            http_instance(string url, unordered_map<string, json> preset_headers);
-            ~http_instance();
+        using TOKEN = uint32_t;
 
-            json requester(request_config config);
+#define MAX_TOKENS 1000
+
+        typedef enum request_method {
+            POST        = 0,
+            GET         = 1,
+            PATCH       = 2,
+            PUT         = 3,
+            DELETE      = 4
+        } request_method;
+
+        // 요청을 진행하기 위한 설정값
+        struct request_config {
+            utility::string_t uri;
+            request_method method;
+            vector<pair<utility::string_t, utility::string_t>> headers;
+            vector<pair<utility::string_t, utility::string_t>> query;
+            json::value body;
         };
 
-        struct request_config {
-            string url,
-            optional<web::http::methods> method,
-            optional<unordered_map<string, json>> headers,
-            optional<unordered_map<string, json>> query,
-            optional<json> body,
+        class http_instance {
+        public:
+            http_instance(utility::string_t url);
+            http_instance(utility::string_t url, vector<pair<utility::string_t, utility::string_t>> preset_headers);
+            ~http_instance();
+
+            // 보낸 요청들의 상태를 확인 업데이트를 진행함
+            void check_requesters();
+
+            // config 넣어주면 주어진 값으로 request를 진행한다.
+            TOKEN requester(request_config config);
+
+            // token값을 통해 해당 요청이 종료되었는지 확인한다.
+            bool is_request_end(TOKEN token);
+
+            // 요청에 대한 token값을 통해 수신받은 값을 가져온다. 이후 토큰을 파기한다
+            json::value get_recived_value(TOKEN token);
+
+        private:
+            utility::string_t baseurl;
+            vector<pair<utility::string_t, utility::string_t>> preset_headers;
+
+            // baseurl 기반 http 클라이언트 객체
+            http_client client;
+
+            // 토큰 발급 관리 전용
+            uint32_t        living_token_count;
+            queue<TOKEN>    available_tokens;
+
+            //map<TOKEN, >
+            map<TOKEN, pplx::task<http_response>> tasks;
+            cancellation_token_source cts;
         };
     };
 };

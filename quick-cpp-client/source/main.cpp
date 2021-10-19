@@ -1,56 +1,31 @@
-#include <cpprest/http_client.h>
-#include <cpprest/filestream.h>
 #include <http_client.hh>
-#include <tcp_client.hh>
 
-using namespace utility;                    // Common utilities like string conversions
-using namespace web;                        // Common features like URIs.
-using namespace web::http;                  // Common HTTP functionality
-using namespace web::http::client;          // HTTP client features
-using namespace concurrency::streams;       // Asynchronous streams
+using namespace quick_client::web_http;
 
 int main(int argc, char* argv[])
 {
-    auto fileStream = std::make_shared<ostream>();
+    // http_instance 생성
+    http_instance instance(L"https://httpbin.org/");
 
-    // Open stream to output file.
-    pplx::task<void> requestTask = fstream::open_ostream(U("results.html")).then([=](ostream outFile)
-        {
-            *fileStream = outFile;
+    // request_config로 request 설정
+    request_config req_config;
+    req_config.uri = L"/get";
+    req_config.method = GET;
+    req_config.query.clear();
+    req_config.headers.clear();
+    req_config.body = json::value::Null;
 
-            // Create http_client to send the request.
-            http_client client(U("http://www.bing.com/"));
+    TOKEN req_token = instance.requester(req_config);
 
-            // Build request URI and start the request.
-            uri_builder builder(U("/search"));
-            builder.append_query(U("q"), U("cpprestsdk github"));
-            return client.request(methods::GET, builder.to_string());
-        })
+    while (true) {
+        if (instance.is_request_end(req_token)) {
+            json::value value = instance.get_recived_value(req_token);
 
-        // Handle response headers arriving.
-            .then([=](http_response response)
-                {
-                    printf("Received response status code:%u\n", response.status_code());
+            wcout << value.to_string() << endl;
 
-                    // Write response body into the file.
-                    return response.body().read_to_end(fileStream->streambuf());
-                })
+            break;
+        }
+    }
 
-            // Close the file stream.
-                    .then([=](size_t)
-                        {
-                            return fileStream->close();
-                        });
-
-                // Wait for all the outstanding I/O to complete and handle any exceptions
-                try
-                {
-                    requestTask.wait();
-                }
-                catch (const std::exception& e)
-                {
-                    printf("Error exception:%s\n", e.what());
-                }
-
-                return 0;
+    return 0;
 }
