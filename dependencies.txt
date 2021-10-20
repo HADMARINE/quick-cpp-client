@@ -1,3 +1,4 @@
-nlohmann-json
 cpprestsdk
 websocketpp
+
+cpprestsdk[default-features,websockets]
